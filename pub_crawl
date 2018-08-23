@@ -78,7 +78,7 @@
         for(var i=0; i < all_markers.length; i++){
             var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
             if( distance < tolerance ){
-                console.log("Found it!")
+                console.log("Got it!")
             }
         }
     }
