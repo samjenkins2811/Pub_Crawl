@@ -1,0 +1,90 @@
+<html>
+  <head>
+    <style>
+        #pub_map {
+            width: 600px;
+            height: 400px;
+            background-color: grey;
+        }
+    </style>
+    <title>Pub Crawl Bitches</title>
+  </head>
+  <body>
+  Let's get twatted!
+  <div id="pub_map"></div>
+  <script>
+    var pub_map;
+    var old_position;
+    var tolerance = 5;
+    // Add proper lat/lng here instead of zeroes
+    var data = `0 0 zombie.png
+    50.620323 -3.413737 beer.png
+    50.624668 -3.410719 beer.png
+    50.621329 -3.411749 beer.png
+    50.618441 -3.413552 beer.png
+    50.619344 -3.415532 beer.png
+    50.620661 -3.415074 beer.png
+    50.619288 -3.411055 beer.png
+    50.618462 -3.410865 beer.png
+    50.619131 -3.414455 beer.png`;
+    // Split the data into an array of lines of data
+    var markers = data.split("\n");
+    // Save the locations of all markers
+    var all_markers = [];
+    function initMap() {
+        // SET YOUR OWN CENTER OF THE MAP
+        pub_map = new google.maps.Map(document.getElementById('pub_map'), {
+            zoom: 15,
+            center: {lat: 50.619751, lng: -3.413410}
+        });
+        // Get geolocation
+        if( navigator.geolocation) {
+            navigator.geolocation.watchPosition(set_my_position);
+        }
+        else {
+            alert("Geolocation doesn't work in your browser");
+        }
+        // Add markers
+        for(var i=0; i < markers.length; i++){
+            // Split this marker's info into an array
+            var marker_data = markers[i].trim().split(" ");
+            // Create the LatLng of the marker
+            var marker_position = new google.maps.LatLng(marker_data[0], marker_data[1]);
+            // Create a marker at this point
+            var marker = new google.maps.Marker({
+              position: marker_position,
+              icon: marker_data[2],
+              map: pub_map
+            });
+            // Add this marker to the list
+            all_markers.push(marker);
+        }
+        console.log(all_markers);
+        // SET YOUR OWN OLD POSITION (same as map center)
+        old_position = new google.maps.Marker({
+            position: {lat: 50.619751, lng: -3.413410},
+            map: pub_map
+        })
+    }
+    function set_my_position(position){
+        old_position.setMap(null);
+        var pos = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+        var marker = new google.maps.Marker({
+          position: pos,
+          icon: "beard.png",
+          map: pub_map
+        });
+        old_position = marker;
+        for(var i=0; i < all_markers.length; i++){
+            var distance = google.maps.geometry.spherical.computeDistanceBetween(pos, all_markers[i].getPosition());
+            if( distance < tolerance ){
+                console.log("Found it!")
+            }
+        }
+    }
+  </script>
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD5s_wnOWFf2Chxvy7ZHd-pUZHAYC_EfGQ&callback=initMap&libraries=geometry">
+  </script>
+  </body>
+</html>
